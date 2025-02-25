@@ -1,0 +1,17 @@
+{
+    "team": 4121,
+    "ntmode": "client",
+    "cameras": [
+        {
+            "name": "front",
+            "path": "/dev/video0",
+            "pixel format": "MJPEG",
+            "width": 640,
+            "height": 480,
+            "fps": 30,
+            "brightness": 50,
+            "white balance": "hold",
+            "exposure": "hold"
+        }
+    ]
+}

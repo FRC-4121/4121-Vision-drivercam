@@ -1,0 +1,74 @@
+plugins {
+    // Apply the application plugin to add support for building a CLI application in Java.
+    id 'application'
+}
+
+repositories {
+    // Use Maven Central for resolving dependencies.
+    mavenCentral()
+    maven {
+        url = uri("https://frcmaven.wpi.edu/artifactory/release")
+    }
+}
+
+dependencies {
+    implementation 'edu.wpi.first.cameraserver:cameraserver-java:2025.2.1'
+    implementation 'edu.wpi.first.cscore:cscore-java:2025.2.1'
+    implementation 'edu.wpi.first.wpilibj:wpilibj-java:2025.2.1'
+    implementation 'org.openpnp:opencv:4.6.0-0' // available for download up to 4.9.0 but APT only goes up to 4.6
+    implementation 'edu.wpi.first.ntcore:ntcore-java:2024.3.2'
+    implementation 'edu.wpi.first.wpiutil:wpiutil-java:2024.3.2'
+    implementation 'edu.wpi.first.wpinet:wpinet-java:2024.3.2'
+    implementation 'edu.wpi.first.wpimath:wpimath-java:2024.3.2'
+    implementation 'com.google.code.gson:gson:2.11.0'
+
+//    runtimeOnly 'edu.wpi.first.cscore:cscorejni:2025.2.1:linuxx86-64'
+    runtimeOnly 'edu.wpi.first.wpiunits:wpiunits-java:2024.3.2' // needed for wpimath
+    runtimeOnly 'edu.wpi.first.ntcore:ntcore-jni:2024.3.2:linuxarm64' // needed for ntcore
+    runtimeOnly 'edu.wpi.first.wpiutil:wpiutil-jni:2024.3.2:linuxarm64' // needed for ntcore
+    runtimeOnly 'edu.wpi.first.wpinet:wpinet-jni:2024.3.2:linuxarm64'
+    runtimeOnly 'edu.wpi.first.ntcore:ntcore-jni:2024.3.2:linuxx86-64' // needed for ntcore
+    runtimeOnly 'edu.wpi.first.wpiutil:wpiutil-jni:2024.3.2:linuxx86-64' // needed for ntcore
+    runtimeOnly 'edu.wpi.first.wpinet:wpinet-jni:2024.3.2:linuxx86-64'
+    runtimeOnly 'edu.wpi.first.cscore:cscore-jni:2025.2.1:linuxx86-64'
+    runtimeOnly 'com.fasterxml.jackson.core:jackson-core:2.18.0' // needed so wpiutil doesn't get upset
+    runtimeOnly 'us.hebi.quickbuf:quickbuf-runtime:1.4' // needed so wpimath doesn't get upset
+    runtimeOnly 'org.ejml:ejml-core:0.43.1' // needed for wpimath
+}
+
+// Apply a specific Java toolchain to ease working on different environments.
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+application {
+    // Define the main class for the application.
+    mainClass = 'frc.drivercam.DrivercamMain'
+    // Look, this is supposed to just make you able to attach JDB but for some reason I can't reproduce the crash when it's enabled
+    // When disabled, there problems in the RectVisionLibrary, somewhere near or within the call to Imgproc.findContours call
+    // There are segfaults, and we get errors directly from malloc and free-- it seems to be corrupting the allocation header
+    // If anyone else wants to find out what caused this, good luck.
+    applicationDefaultJvmArgs = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=n']
+}
+
+tasks.register("setupRunScript") {
+    dependsOn "compileJava"
+    mkdir "$buildDir"
+    def path = sourceSets.main.runtimeClasspath.asPath
+    def f = file("$buildDir/run.sh")
+    f.setText("#!/bin/sh\nexport CLASSPATH=\"$path\"\nexport LD_PRELOAD=\"\$(find \"\${NATIVECACHE:-\$HOME/.wpilib/nativecache}\" -name '*wpiutil*' | paste -sd :)\"\njava -agentlib:jdwp=transport=dt_socket,server=y,suspend=n frc.drivercam.DrivercamMain \"\$@\"")
+    f.setExecutable(true)
+}
+
+tasks.named("build") {
+    dependsOn "setupRunScript"
+}
+
+tasks.withType(JavaCompile) {}
+
+tasks.withType(JavaExec) {
+    def found = fileTree(dir: System.properties["user.home"] + "/.wpilib/nativecache", include: "**/*wpiutil*").join ":"
+    environment "LD_PRELOAD", found
+}
