@@ -73,7 +73,7 @@ import org.opencv.core.Mat;
  */
 
 public final class DrivercamMain {
-  private static String configFile = "/tmp/frc.json";
+  private static String configFile = "/home/team4121/4121-Vision-drivercam/config/2024_competition/frc.json";
 
   @SuppressWarnings("MemberName")
   public static class CameraConfig {

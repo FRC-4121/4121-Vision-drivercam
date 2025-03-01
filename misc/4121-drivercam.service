@@ -1,0 +1,12 @@
+[Unit]
+Description=4121 Drivercam
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/bash /home/team4121/4121-Vision-drivercam/build/run.sh
+Environment=NATIVECACHE=/home/team4121/.wpilib/nativecache JDK_JAVA_OPTIONS=-Xmx2048M
+Restart=on-failure
+User=team4121
+
+[Install]
+WantedBy=default.target

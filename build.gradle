@@ -27,6 +27,7 @@ dependencies {
     runtimeOnly 'edu.wpi.first.ntcore:ntcore-jni:2024.3.2:linuxarm64' // needed for ntcore
     runtimeOnly 'edu.wpi.first.wpiutil:wpiutil-jni:2024.3.2:linuxarm64' // needed for ntcore
     runtimeOnly 'edu.wpi.first.wpinet:wpinet-jni:2024.3.2:linuxarm64'
+    runtimeOnly 'edu.wpi.first.cscore:cscore-jni:2024.3.2:linuxarm64'
     runtimeOnly 'edu.wpi.first.ntcore:ntcore-jni:2024.3.2:linuxx86-64' // needed for ntcore
     runtimeOnly 'edu.wpi.first.wpiutil:wpiutil-jni:2024.3.2:linuxx86-64' // needed for ntcore
     runtimeOnly 'edu.wpi.first.wpinet:wpinet-jni:2024.3.2:linuxx86-64'
